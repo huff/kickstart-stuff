@@ -55,25 +55,25 @@ repo --name="rhel54-x86_64" --baseurl=http://porkchop.devel.redhat.com/released/
 #
 %post
 # Do Ec2 stuff
-#cat <<EOL > /etc/fstab
-#/dev/hda1  /         ext3    defaults        1 1
-#/dev/hda2  /mnt      ext3    defaults        1 2
-#/dev/hda3  swap      swap    defaults        0 0
-#none       /dev/pts  devpts  gid=5,mode=620  0 0
-#none       /dev/shm  tmpfs   defaults        0 0
-#none       /proc     proc    defaults        0 0
-#none       /sys      sysfs   defaults        0 0
-#EOL
-#
-#if [ "$(uname -i)" = "x86_64" ]; then
-#cat <<EOL > /etc/fstab
-#/dev/hda1  /         ext3    defaults        1 1
-#/dev/hdb   /mnt      ext3    defaults        0 0
-#none       /proc     proc    defaults        0 0
-#none       /sys      sysfs   defaults        0 0
-#none       /dev/pts  devpts  gid=5,mode=620    0 0
-#EOL
-#fi
+cat <<EOL > /etc/fstab
+/dev/hda1  /         ext3    defaults        1 1
+/dev/hda2  /mnt      ext3    defaults        1 2
+/dev/hda3  swap      swap    defaults        0 0
+none       /dev/pts  devpts  gid=5,mode=620  0 0
+none       /dev/shm  tmpfs   defaults        0 0
+none       /proc     proc    defaults        0 0
+none       /sys      sysfs   defaults        0 0
+EOL
+
+if [ "$(uname -i)" = "x86_64" ]; then
+cat <<EOL > /etc/fstab
+/dev/hda1  /         ext3    defaults        1 1
+/dev/hdb   /mnt      ext3    defaults        0 0
+none       /proc     proc    defaults        0 0
+none       /sys      sysfs   defaults        0 0
+none       /dev/pts  devpts  gid=5,mode=620    0 0
+EOL
+fi
 
 cat <<EOL > /etc/sysconfig/network-scripts/ifcfg-eth0
 ONBOOT=yes
