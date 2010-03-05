@@ -55,5 +55,60 @@ repo --name="rhel54-x86_64" --baseurl=http://porkchop.devel.redhat.com/released/
 #
 %post
 # Do Ec2 stuff
+#cat <<EOL > /etc/fstab
+#/dev/hda1  /         ext3    defaults        1 1
+#/dev/hda2  /mnt      ext3    defaults        1 2
+#/dev/hda3  swap      swap    defaults        0 0
+#none       /dev/pts  devpts  gid=5,mode=620  0 0
+#none       /dev/shm  tmpfs   defaults        0 0
+#none       /proc     proc    defaults        0 0
+#none       /sys      sysfs   defaults        0 0
+#EOL
+#
+#if [ "$(uname -i)" = "x86_64" ]; then
+#cat <<EOL > /etc/fstab
+#/dev/hda1  /         ext3    defaults        1 1
+#/dev/hdb   /mnt      ext3    defaults        0 0
+#none       /proc     proc    defaults        0 0
+#none       /sys      sysfs   defaults        0 0
+#none       /dev/pts  devpts  gid=5,mode=620    0 0
+#EOL
+#fi
+
+cat <<EOL > /etc/sysconfig/network-scripts/ifcfg-eth0
+ONBOOT=yes
+DEVICE=eth0
+BOOTPROTO=dhcp
+EOL
+
+cat <<EOL >> /etc/rc.local
+if [ ! -d /root/.ssh ] ; then
+    mkdir -p /root/.ssh
+    chmod 0700 /root/.ssh
+fi
+
+# Fetch public key using HTTP
+curl -f http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key >
+/tmp/my-key
+if [ $? -eq 0 ] ; then
+    cat /tmp/my-key >> /root/.ssh/authorized_keys
+    chmod 0600 /root/.ssh/authorized_keys
+    rm /tmp/my-key
+fi
+
+# or fetch public key using the file in the ephemeral store:
+if [ -e /mnt/openssh_id.pub ] ; then
+    cat /mnt/openssh_id.pub >> /root/.ssh/authorized_keys
+    chmod 0600 /root/.ssh/authorized_keys
+fi
+EOL
+
+cat <<EOL >> /etc/ssh/sshd_config
+UseDNS  no
+PermitRootLogin without-password
+EOL
+
+%end
+
 %end
 
