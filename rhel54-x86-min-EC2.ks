@@ -5,7 +5,7 @@ lang C
 keyboard us
 timezone US/Eastern
 auth --useshadow --enablemd5
-selinux --permissive
+selinux --disabled
 firewall --enabled --service=ssh
 bootloader --timeout=1 --append="acpi=force"
 network --bootproto=dhcp --device=eth0 --onboot=on
@@ -23,7 +23,7 @@ services --enabled=network,sshd
 # not by the livecd tools.
 #
 part /boot --size 100 --fstype ext3 --ondisk hda
-part / --size 1024 --fstype ext3 --ondisk hda
+part / --size 650 --fstype ext3 --ondisk hda
 
 #
 # Repositories
@@ -32,7 +32,6 @@ part / --size 1024 --fstype ext3 --ondisk hda
 #repo --name=released --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-12&arch=$basearch
 # To include updates, use the following "repo" (enabled by default)
 #repo --name=updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f12&arch=$basearch
-
 repo --name="rhel54-x86_64" --baseurl=http://porkchop.devel.redhat.com/released/RHEL-5-Server/U4/x86_64/os/Server/
 
 # To compose against rawhide, use the following "repo" (disabled by default)
@@ -45,9 +44,69 @@ repo --name="rhel54-x86_64" --baseurl=http://porkchop.devel.redhat.com/released/
 #
 # Add all the packages after the base packages
 #
-%packages --excludedocs
-@core
-@base
+%packages --excludedocs --nobase
+bash
+kernel-xen-2.6.18-164.el5
+#kernel-debug - needed for vmlinux?
+grub
+e2fsprogs
+passwd
+policycoreutils
+chkconfig
+rootfiles
+yum
+acpid
+
+/usr/sbin/lokkit
+
+#needed to disable selinux
+#rhel 5.4 complained this wasn't available
+#lokkit
+
+#Allow for dhcp access
+dhclient
+iputils
+
+#Needed for remote login
+openssh-server
+
+#
+# Packages to Remove
+#
+
+# no need for kudzu if the hardware doesn't change
+-kudzu
+-prelink
+-setserial
+-ed
+
+# Remove the authconfig pieces
+-authconfig
+-rhpl
+-wireless-tools
+
+# Remove the kbd bits
+-kbd
+-usermode
+
+# these are all kind of overkill but get pulled in by mkinitrd ordering
+# mkinitrd needed to build ec2 ramdisk removed in post
+mkinitrd
+-kpartx
+-dmraid
+-mdadm
+-lvm2
+-tar
+
+# selinux toolchain of policycoreutils, libsemanage, ustr
+-policycoreutils
+-checkpolicy
+-selinux-policy*
+-libselinux-python
+-libselinux
+
+# Things it would be nice to loose
+
 %end
 
 #
@@ -88,8 +147,7 @@ if [ ! -d /root/.ssh ] ; then
 fi
 
 # Fetch public key using HTTP
-curl -f http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key >
-/tmp/my-key
+curl -f http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key > /tmp/my-key
 if [ $? -eq 0 ] ; then
     cat /tmp/my-key >> /root/.ssh/authorized_keys
     chmod 0600 /root/.ssh/authorized_keys
@@ -110,4 +168,21 @@ EOL
 
 %end
 
+#%post
+## create ramdisk for ec2 images
+#ver=$(rpm -q --qf '%{version}' kernel-xen)
+#rel=$(rpm -q --qf '%{release}' kernel-xen)
+#arch=$(rpm -q --qf '%{arch}' kernel-xen)
+
+#/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.$arch.img  $ver-$rel.$arch
+#cp initrd-$ver-$rel.$arch.img /tmp/initrd.img
+#cp /boot/vmlinuz-$ver-$rel.$arch /tmp/vmlinuz
+#rpm -e mkinitrd
+#%end
+
+#%post --nochroot
+## Move ramdisk and kernel images outside of image
+#mv $INSTALL_ROOT/tmp/vmlinuz ./include
+#mv $INSTALL_ROOT/tmp/initrd.img ./include
+#%end
 
