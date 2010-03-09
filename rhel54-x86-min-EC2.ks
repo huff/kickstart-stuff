@@ -22,8 +22,8 @@ services --enabled=network,sshd
 # This information is used by appliance-tools but
 # not by the livecd tools.
 #
-part /boot --size 100 --fstype ext3 --ondisk hda
-part / --size 650 --fstype ext3 --ondisk hda
+#part /boot --size 100 --fstype ext3 --ondisk hda
+part / --size 650 --fstype ext3 --ondisk sda
 
 #
 # Repositories
@@ -168,21 +168,21 @@ EOL
 
 %end
 
-#%post
+%post
 ## create ramdisk for ec2 images
-#ver=$(rpm -q --qf '%{version}' kernel-xen)
-#rel=$(rpm -q --qf '%{release}' kernel-xen)
-#arch=$(rpm -q --qf '%{arch}' kernel-xen)
+ver=$(rpm -q --qf '%{version}' kernel-xen)
+rel=$(rpm -q --qf '%{release}' kernel-xen)
+arch=$(rpm -q --qf '%{arch}' kernel-xen)
 
-#/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.$arch.img  $ver-$rel.$arch
-#cp initrd-$ver-$rel.$arch.img /tmp/initrd.img
-#cp /boot/vmlinuz-$ver-$rel.$arch /tmp/vmlinuz
-#rpm -e mkinitrd
-#%end
+/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.img  $ver-${rel}xen
+cp initrd-$ver-$rel.img /tmp/initrd.img
+cp /boot/vmlinuz-$ver-${rel}xen /tmp/vmlinuz
+rpm -e mkinitrd
+%end
 
-#%post --nochroot
-## Move ramdisk and kernel images outside of image
-#mv $INSTALL_ROOT/tmp/vmlinuz ./include
-#mv $INSTALL_ROOT/tmp/initrd.img ./include
-#%end
+%post --nochroot
+# Move ramdisk and kernel images outside of image
+mv $INSTALL_ROOT/tmp/vmlinuz ./include
+mv $INSTALL_ROOT/tmp/initrd.img ./include
+%end
 
