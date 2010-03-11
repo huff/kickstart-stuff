@@ -6,7 +6,7 @@ keyboard us
 timezone US/Eastern
 auth --useshadow --enablemd5
 selinux --disabled
-firewall --enabled --service=ssh
+firewall --enabled --ssh
 bootloader --timeout=1 --append="acpi=force"
 network --bootproto=dhcp --device=eth0 --onboot=on
 services --enabled=network,sshd
@@ -170,19 +170,19 @@ EOL
 
 %post
 ## create ramdisk for ec2 images
-ver=$(rpm -q --qf '%{version}' kernel-xen)
-rel=$(rpm -q --qf '%{release}' kernel-xen)
-arch=$(rpm -q --qf '%{arch}' kernel-xen)
+#ver=$(rpm -q --qf '%{version}' kernel-xen)
+#rel=$(rpm -q --qf '%{release}' kernel-xen)
+#arch=$(rpm -q --qf '%{arch}' kernel-xen)
 
-/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.img  $ver-${rel}xen
-cp initrd-$ver-$rel.img /tmp/initrd.img
-cp /boot/vmlinuz-$ver-${rel}xen /tmp/vmlinuz
-rpm -e mkinitrd
-%end
+#/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.img  $ver-${rel}xen
+#cp initrd-$ver-$rel.img /tmp/initrd.img
+#cp /boot/vmlinuz-$ver-${rel}xen /tmp/vmlinuz
+#rpm -e mkinitrd
+#%end
 
-%post --nochroot
+#%post --nochroot
 # Move ramdisk and kernel images outside of image
-mv $INSTALL_ROOT/tmp/vmlinuz ./include
-mv $INSTALL_ROOT/tmp/initrd.img ./include
+#mv $INSTALL_ROOT/tmp/vmlinuz ./include
+#mv $INSTALL_ROOT/tmp/initrd.img ./include
 %end
 
