@@ -169,9 +169,9 @@ ver=$(rpm -q --qf '%{version}' kernel)
 rel=$(rpm -q --qf '%{release}' kernel)
 arch=$(rpm -q --qf '%{arch}' kernel)
 
-/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.$arch.img  $ver-$rel.$arch
+/sbin/mkinitrd --fstab=/etc/fstab --preload=xenblk --preload=xennet --preload=raid1 initrd-$ver-$rel.$arch.img  $ver-${rel}.$arch
 cp initrd-$ver-$rel.$arch.img /tmp/initrd.img
-cp /boot/vmlinuz-$ver-$rel.$arch /tmp/vmlinuz
+cp /boot/vmlinuz-$ver-${rel}.$arch /tmp/vmlinuz
 rpm -e mkinitrd
 %end
 
