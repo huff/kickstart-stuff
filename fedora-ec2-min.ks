@@ -5,7 +5,7 @@ lang C
 keyboard us
 timezone US/Eastern
 auth --useshadow --enablemd5
-selinux --permissive
+#selinux --permissive
 firewall --enabled --service=ssh
 bootloader --timeout=1 --append="acpi=force"
 network --bootproto=dhcp --device=eth0 --onboot=on
@@ -22,7 +22,7 @@ services --enabled=network,sshd
 # This information is used by appliance-tools but
 # not by the livecd tools.
 #
-part / --size 650 --fstype ext3 --ondisk sda
+part / --size 650 --fstype ext3 --ondisk xvda
 
 #
 # Repositories
@@ -110,7 +110,7 @@ mkinitrd
 %post
 # Do Ec2 stuff
 cat <<EOL > /etc/fstab
-/dev/sda1  /         ext3    defaults        1 1
+/dev/xvda1  /         ext3    defaults        1 1
 /dev/sda2  /mnt      ext3    defaults        1 2
 /dev/sda3  swap      swap    defaults        0 0
 none       /dev/pts  devpts  gid=5,mode=620  0 0
@@ -121,7 +121,7 @@ EOL
 
 if [ "$(uname -i)" = "x86_64" ]; then
 cat <<EOL > /etc/fstab
-/dev/sda1  /         ext3    defaults        1 1
+/dev/xvda1  /         ext3    defaults        1 1
 /dev/sdb   /mnt      ext3    defaults        0 0
 none       /proc     proc    defaults        0 0
 none       /sys      sysfs   defaults        0 0
