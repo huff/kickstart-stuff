@@ -50,6 +50,7 @@ grub
 e2fsprogs
 passwd
 policycoreutils
+selinux-policy-*
 chkconfig
 rootfiles
 yum
@@ -64,6 +65,9 @@ iputils
 
 #Needed for remote login
 openssh-server
+
+#Eucalyptus tools
+euca2ools
 
 #
 # Packages to Remove
@@ -94,11 +98,10 @@ mkinitrd
 -tar
 
 # selinux toolchain of policycoreutils, libsemanage, ustr
--policycoreutils
--checkpolicy
--selinux-policy*
--libselinux-python
--libselinux
+#-checkpolicy
+#-selinux-policy*
+#-libselinux-python
+#-libselinux
 
 # Things it would be nice to loose
 
