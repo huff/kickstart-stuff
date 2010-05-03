@@ -22,7 +22,7 @@ services --enabled=network,sshd
 # This information is used by appliance-tools but
 # not by the livecd tools.
 #
-part / --size 650 --fstype ext3 --ondisk xvda
+part / --size 650 --fstype ext3 --ondisk sda
 
 #
 # Repositories
@@ -113,7 +113,7 @@ mkinitrd
 %post
 # Do Ec2 stuff
 cat <<EOL > /etc/fstab
-/dev/xvda1  /         ext3    defaults        1 1
+/dev/sda1  /         ext3    defaults        1 1
 /dev/sda2  /mnt      ext3    defaults        1 2
 /dev/sda3  swap      swap    defaults        0 0
 none       /dev/pts  devpts  gid=5,mode=620  0 0
@@ -124,7 +124,7 @@ EOL
 
 if [ "$(uname -i)" = "x86_64" ]; then
 cat <<EOL > /etc/fstab
-/dev/xvda1  /         ext3    defaults        1 1
+/dev/sda1  /         ext3    defaults        1 1
 /dev/sdb   /mnt      ext3    defaults        0 0
 none       /proc     proc    defaults        0 0
 none       /sys      sysfs   defaults        0 0
